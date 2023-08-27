@@ -60,6 +60,17 @@ void SetMine(char board[ROWS][COLS], int row, int col)
 	}
 }
 
+
+int get_mine_count(char board[ROWS][COLS], int x, int y)
+{
+	//'1'-'0'--->1
+	//'0'-'0'-->0
+	return board[x - 1][y] + board[x - 1][y - 1] + board[x][y - 1] +
+		board[x + 1][y - 1] + board[x + 1][y] + board[x + 1][y + 1] +
+		board[x][y + 1] + board[x - 1][y + 1] - 8 * board[x][y];
+}
+
+
 void FindMine(char mine[ROWS][COLS], char show[ROWS][COLS], int row, int col)
 {
 	while (1)
@@ -74,18 +85,9 @@ void FindMine(char mine[ROWS][COLS], char show[ROWS][COLS], int row, int col)
 			if (mine[x][y] == '0')
 			{
 				//无地雷，需计算周边的地雷数量
-				int m = 0;
-				int n = 0;
-				int sum = 0;
-				for (m = x - 1; m <= x + 1; m++)
-				{
-					for (n = y - 1; n <= y + 1; n++)
-					{
-						if (mine[m][n] == '1')
-							sum++;
-					}
-				}
-				show[x][y] = sum+48;//字符和数字间转换
+				int count = get_mine_count(mine, x, y);
+				//转换为数字字符
+				show[x][y] = count+'0';
 				DisplayBoard(show, ROW, COL);
 			}
 			else
