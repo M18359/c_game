@@ -70,9 +70,56 @@ int get_mine_count(char board[ROWS][COLS], int x, int y)
 		board[x][y + 1] + board[x - 1][y + 1] - 8 * board[x][y];
 }
 
+void Judge(char mine[ROWS][COLS], char show[ROWS][COLS], int x, int y,int row,int col)
+{
+		//无地雷，需计算周边的地雷数量
+		int count = get_mine_count(mine, x, y);
+		//转换为数字字符
+		if (count == 0)//该坐标周围没有雷--递归
+		{
+			show[x][y] = ' ';
+			//排查其附近的位置---递归
+			int m = 0;
+			int n = 0;
+			for (m = -1; m <= 1; m++)
+			{
+				for (n = -1; n <= 1; n++)
+				{
+					if (m ==n && m==0)
+					{
+						;//不是原来的位置才被后续处理
+					}
+					else
+					{
+						//判断合法性
+						if (x+m >= 1 && x+m <= row && y+n >= 1 && y+n <= col)
+						{
+							//判断有没有被排查过
+							if (show[x + m][y + n] != '*')
+							{
+								;
+							}
+							else//没被排查
+							{
+								Judge(mine, show, x + m, y + n,ROW,COL);
+							}
+						}
+						
+					}
+				}
+			}
+		}
+		else
+		{
+			show[x][y] = count + '0';
+			//DisplayBoard(show, ROW, COL);
+			//win++;
+		}
+}
 
 void FindMine(char mine[ROWS][COLS], char show[ROWS][COLS], int row, int col)
 {
+	//int win = 0;
 	while (1)
 	{
 		int x = 0;
@@ -82,20 +129,27 @@ void FindMine(char mine[ROWS][COLS], char show[ROWS][COLS], int row, int col)
 		//判断坐标正确性
 		if (x >= 1 && x <= row && y >= 1 && y <= col)
 		{
-			if (mine[x][y] == '0')
+			//判断是否被排查过
+			if (show[x][y] != '*')
 			{
-				//无地雷，需计算周边的地雷数量
-				int count = get_mine_count(mine, x, y);
-				//转换为数字字符
-				show[x][y] = count+'0';
-				DisplayBoard(show, ROW, COL);
+				printf("该坐标已被排查过了，请重新输入!\n");
 			}
 			else
 			{
-				//有地雷，退出游戏
-				printf("有地雷，退出游戏!\n");
-				DisplayBoard(mine, ROW, COL);
-				break;
+				//判断是不是地雷
+				if (mine[x][y] == '0')
+				{
+					//无地雷
+					Judge(mine, show, x, y,ROW,COL);
+					DisplayBoard(show, ROW, COL);
+				}
+				else
+				{
+					//有地雷，退出游戏
+					printf("有地雷，退出游戏!\n");
+					DisplayBoard(mine, ROW, COL);
+					break;
+				}
 			}
 		}
 		else
@@ -103,6 +157,11 @@ void FindMine(char mine[ROWS][COLS], char show[ROWS][COLS], int row, int col)
 			printf("输入坐标有误，请重新输入\n");
 		}
 	}
+	/*if (win == row * col - EASY_COUNT)
+	{
+		printf("恭喜获胜\n");
+		DisplayBoard(mine, ROW, COL);
+	}*/
 }
 
 
